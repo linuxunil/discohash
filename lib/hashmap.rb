@@ -12,13 +12,16 @@ class Hashmap
   end
 
   def set(key, value)
-    @buckets[hash(key)] = [value, key]
+    @buckets[check_bounds(hash(key))].append([value, key])
   end
 
   def get(key)
+    @buckets[hash(key)][0]
   end
 
   def has?(key)
+    @buckets.each { return true if bucket.contains?(key) }
+    false
   end
 
   def remove(key)
@@ -39,22 +42,21 @@ class Hashmap
   def entries
   end
 
-  def self.hash(key)
-    raise 'Key cannot be nil' if key.nil?
-
+  # FIXME: Hash doesn't return a correct value
+  def hash(key)
     hash_code = 0
     prime_number = 31
 
     key.each_char { |char| hash_code = prime_number * hash_code + char.ord }
 
-    hash_code
-
-    # (((key * @constant) % 1) * 2**32).floor
+    hash_code % @capacity
   end
 
   private
 
   def check_bounds(index)
     raise IndexError if index.negative? || index >= @buckets.length
+
+    index
   end
 end
